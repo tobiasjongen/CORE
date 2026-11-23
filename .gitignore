@@ -44,3 +44,6 @@ expected_results/
 
 # vcpkg
 vcpkg/
+
+# Results of run_query.py --output
+output/
