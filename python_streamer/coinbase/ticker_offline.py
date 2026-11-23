@@ -1,7 +1,7 @@
 import pathlib
 from typing import Optional, final
 
-import _pycore
+import pycer
 from abstract_streamer_offline import AbstractStreamerOffline
 from coinbase.models.ticker import TickerModel
 
@@ -51,19 +51,19 @@ class TickerStreamerOffline(AbstractStreamerOffline[TickerModel]):
         return event_id
 
     def create_event(self, model: TickerModel):
-        product_id = _pycore.PyStringValue(model.product_id)
-        price = _pycore.PyDoubleValue(model.price)
-        open_24h = _pycore.PyDoubleValue(model.open_24h)
-        volume_24h = _pycore.PyDoubleValue(model.volume_24h)
-        low_24h = _pycore.PyDoubleValue(model.low_24h)
-        high_24h = _pycore.PyDoubleValue(model.high_24h)
-        volume_30d = _pycore.PyDoubleValue(model.volume_30d)
-        best_bid = _pycore.PyDoubleValue(model.best_bid)
-        best_bid_size = _pycore.PyDoubleValue(model.best_bid_size)
-        best_ask = _pycore.PyDoubleValue(model.best_ask)
-        best_ask_size = _pycore.PyDoubleValue(model.best_ask_size)
-        last_size = _pycore.PyDoubleValue(model.last_size)
-        time = _pycore.PyIntValue(int(model.time.timestamp() * 1e9))
+        product_id = pycer.PyStringValue(model.product_id)
+        price = pycer.PyDoubleValue(model.price)
+        open_24h = pycer.PyDoubleValue(model.open_24h)
+        volume_24h = pycer.PyDoubleValue(model.volume_24h)
+        low_24h = pycer.PyDoubleValue(model.low_24h)
+        high_24h = pycer.PyDoubleValue(model.high_24h)
+        volume_30d = pycer.PyDoubleValue(model.volume_30d)
+        best_bid = pycer.PyDoubleValue(model.best_bid)
+        best_bid_size = pycer.PyDoubleValue(model.best_bid_size)
+        best_ask = pycer.PyDoubleValue(model.best_ask)
+        best_ask_size = pycer.PyDoubleValue(model.best_ask_size)
+        last_size = pycer.PyDoubleValue(model.last_size)
+        time = pycer.PyIntValue(int(model.time.timestamp() * 1e9))
         attributes = [
             product_id,
             price,
@@ -81,6 +81,6 @@ class TickerStreamerOffline(AbstractStreamerOffline[TickerModel]):
         ]
         event_id = self.get_event_id_from_model(model)
 
-        event = _pycore.PyEvent(event_id, attributes, time)
+        event = pycer.PyEvent(event_id, attributes, time)
 
         return event

@@ -1,7 +1,7 @@
 import json
 from typing import Optional, final
 
-import _pycore
+import pycer
 from abstract_streamer_websocket import AbstractStreamerWebsocket
 from bluesky.models.commit import CommitWrapperEventModel
 
@@ -112,13 +112,13 @@ class CreatePostStreamer(AbstractStreamerWebsocket[CommitWrapperEventModel]):
         return event_id
 
     def common_event_attributes(self, model: CommitWrapperEventModel):
-        did = _pycore.PyStringValue(model.did)
-        kind = _pycore.PyStringValue(model.kind)
-        time = _pycore.PyIntValue(int(model.commit.record.createdAt.timestamp() * 1e9))
-        time_str = _pycore.PyStringValue(model.commit.record.createdAt.__str__())
-        cid = _pycore.PyStringValue(model.commit.cid)
-        operation = _pycore.PyStringValue(model.commit.operation)
-        record_type = _pycore.PyStringValue(model.commit.record.record_type)
+        did = pycer.PyStringValue(model.did)
+        kind = pycer.PyStringValue(model.kind)
+        time = pycer.PyIntValue(int(model.commit.record.createdAt.timestamp() * 1e9))
+        time_str = pycer.PyStringValue(model.commit.record.createdAt.__str__())
+        cid = pycer.PyStringValue(model.commit.cid)
+        operation = pycer.PyStringValue(model.commit.operation)
+        record_type = pycer.PyStringValue(model.commit.record.record_type)
 
         attributes = [did, kind, time, time_str, cid, operation, record_type]
 
@@ -129,8 +129,8 @@ class CreatePostStreamer(AbstractStreamerWebsocket[CommitWrapperEventModel]):
             model.commit.record.record_type == "app.bsky.feed.like"
             or model.commit.record.record_type == "app.bsky.feed.repost"
         )
-        subject_cid = _pycore.PyStringValue(model.commit.record.subject.cid)
-        subject_uri = _pycore.PyStringValue(model.commit.record.subject.uri)
+        subject_cid = pycer.PyStringValue(model.commit.record.subject.cid)
+        subject_uri = pycer.PyStringValue(model.commit.record.subject.uri)
 
         attributes = [subject_cid, subject_uri]
 
@@ -138,8 +138,8 @@ class CreatePostStreamer(AbstractStreamerWebsocket[CommitWrapperEventModel]):
 
     def event_post_attributes(self, model: CommitWrapperEventModel):
         assert model.commit.record.record_type == "app.bsky.feed.post"
-        langs = _pycore.PyStringValue(", ".join(model.commit.record.langs))
-        text = _pycore.PyStringValue(model.commit.record.text)
+        langs = pycer.PyStringValue(", ".join(model.commit.record.langs))
+        text = pycer.PyStringValue(model.commit.record.text)
 
         attributes = [langs, text]
 
@@ -147,7 +147,7 @@ class CreatePostStreamer(AbstractStreamerWebsocket[CommitWrapperEventModel]):
 
     def event_follow_attributes(self, model: CommitWrapperEventModel):
         assert model.commit.record.record_type == "app.bsky.graph.follow"
-        subject = _pycore.PyStringValue(model.commit.record.subject)
+        subject = pycer.PyStringValue(model.commit.record.subject)
 
         attributes = [subject]
 
@@ -199,9 +199,9 @@ class CreatePostStreamer(AbstractStreamerWebsocket[CommitWrapperEventModel]):
 
         event_id = self.get_event_id_from_model(model)
 
-        time = _pycore.PyIntValue(int(model.commit.record.createdAt.timestamp() * 1e9))
+        time = pycer.PyIntValue(int(model.commit.record.createdAt.timestamp() * 1e9))
 
-        event = _pycore.PyEvent(event_id, attributes, time)
+        event = pycer.PyEvent(event_id, attributes, time)
 
         # self.cached_models.append(model)
         #

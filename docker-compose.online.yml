@@ -1,0 +1,63 @@
+# Online setup: engine, REST/websocket API and live streamer in separate containers.
+#
+#   docker compose build                                  # base image (crivero1/cer-core)
+#   docker compose -f docker-compose.online.yml up --build
+#
+# The API is then reachable on http://localhost:8000.
+
+x-core-online: &core-online
+  image: cer-core-online
+  build:
+    context: .
+    dockerfile: Dockerfile.online
+  init: true
+
+services:
+  # CORE engine: router :5000, stream listener :5001, query results :5002+
+  core-engine:
+    <<: *core-online
+    command:
+      - python
+      - -c
+      - |
+        import threading, pycer
+        server = pycer.PyOnlineServer(5000, 5001, 5002)
+        print("CORE engine running", flush=True)
+        threading.Event().wait()
+    volumes:
+      - ./logs:/CORE/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('localhost', 5000), 1)"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  # FastAPI server: declare streams, add queries, receive matches via websocket
+  core-api:
+    <<: *core-online
+    command:
+      - core-server
+      - --host=0.0.0.0
+      - --port=8000
+      - --core-host=tcp://core-engine
+      - --core-router-port=5000
+    ports:
+      - 8000:8000
+    depends_on:
+      core-engine:
+        condition: service_healthy
+    restart: on-failure
+
+  # Live data from Coinbase and Bluesky, forwarded to the engine
+  streamer:
+    <<: *core-online
+    working_dir: /CORE/python_streamer
+    command: ["python", "-u", "main.py"]
+    environment:
+      CORE_HOST: tcp://core-engine
+      CORE_ROUTER_PORT: "5000"
+      CORE_STREAM_PORT: "5001"
+    depends_on:
+      core-engine:
+        condition: service_healthy
+    restart: on-failure

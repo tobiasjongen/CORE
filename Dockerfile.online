@@ -1,0 +1,17 @@
+# syntax=docker/dockerfile:1
+
+# Image for the online setup (docker-compose.online.yml).
+# Builds on the base image from Dockerfile, which provides pycer in /CORE/.venv.
+FROM crivero1/cer-core
+
+WORKDIR /CORE
+
+COPY core_server_py /CORE/core_server_py
+COPY python_streamer /CORE/python_streamer
+
+# Install the API server and the streamer's dependencies next to pycer
+RUN uv pip install --python /CORE/.venv/bin/python \
+    /CORE/core_server_py \
+    "pydantic>=2.11.7" "tqdm>=4.67.1" "websockets>=15.0.1"
+
+ENV PATH="/CORE/.venv/bin:$PATH"
